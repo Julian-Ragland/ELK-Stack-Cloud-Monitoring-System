@@ -34,7 +34,6 @@ Integrating an ELK server allows users to easily monitor the vulnerable VMs for 
 - What does Metricbeat record? - system-level CPU usage, memory, file system, disk IO, and network IO statistics, as well as top-like statistics for every process running on your systems.
 
 The configuration details of each machine may be found below.
-_Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdown_tables) to add/remove values from the table_.
 
 | Name     | Function | IP Address | Operating System |
 |----------|----------|------------|------------------|
@@ -45,15 +44,17 @@ _Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdow
 
 ### Access Policies
 
-The machines on the internal network are not exposed to the public Internet. 
+The machines on the internal network are not exposed to the Public Internet. 
 
 Only the Jumpbox machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
+
 - IP ADDRESS: 172.90.6.190
 
 Machines within the network can only be accessed by Jumpbox
-- _TODO: Which machine did you allow to access your ELK VM? What was its IP address?_
 
-The Elk VM was accessible via ssh from my jumpbox provisioner as well as my web 1,2 & 3 web servers, which actively send data to it via ports 9200 & 5601. IP Address  10.0.0.7
+The Elk VM was accessible via SSH from my jumpbox provisioner as well as my web 1,2 & 3 web servers, which actively send data to it via ports 9200 & 5601. 
+
+IP Address 10.0.0.7
 
 A summary of the access policies in place can be found in the table below.
 
@@ -82,7 +83,6 @@ The following screenshot displays the result of running `docker ps` after succes
 https://www.dropbox.com/s/noqshvr9gx9nm0w/Docker%20Setup%20Confirmation%20%28Kibana%29.png?dl=0
 
 ### Target Machines & Beats
-This ELK server is configured to monitor the following machines:
 
 Elk Server is monitoring web servers  1,2 and 3 at the following IP Addresses 10.0.0.12, 10.0.0.14 and 10.0.0.15
 
@@ -96,43 +96,12 @@ These Beats allow us to collect the following information from each machine:
 
 Filebeat collects log data for our web servers and forwards them to our elk server so that we may track and analyze them in Kibana. It is essentially a log forwarding tool that itemized and tracks all files on the server and reports changes to them. 
 
+Metricbeat. We expect to collect a wide assortment of data from which countries accessed the web servers, when and what they downloaded. It will also show up geographically where are vistors come from and what time they visited as well as the filetype in which they downloaded. 
 
-Metricbeat. We expect to collect a wide assortment of data from which coutries accessed the web servers, when and what they downloaded. It will also show up geographically where are vistors come from and what time they visited as well as the filetype in which they downloaded. Metric beat shows us advanced metrics that we can use to better understand when, where and what our visitors are doing on our website
 
+### Playbook - Filebeat
 
-### Using the Playbook
-In order to use the playbook, you will need to have an Ansible control node already configured. Assuming you have such a control node provisioned: 
-
-SSH into the control node and follow the steps below:
-- Copy the config file to etc/ansible/files.
-- Update the config file to include your elk server internal ip address
-- Run the playbook, and navigate to kibana to check that the installation worked as expected.
-
-_TODO: Answer the following questions to fill in the blanks:_
-- _Which file is the playbook? Where do you copy it?_
-
-Filebeat-playbook.yml - /etc/filebeat/filebeat.yml
-Metricbeat-playbook.yml - /etc/metricbeat/metricbeat.yml
-
-- _Which file do you update to make Ansible run the playbook on a specific machine? How do I specify which machine to install the ELK server on versus which to install Filebeat on? Hosts 
-
-Hosts
-
-- _Which URL do you navigate to in order to check that the ELK server is running?
-
-http://13.69.174.248:5601/app/kibana#/home
-
-^ Public IP Address of Elk Server
-
-_As a **Bonus**, provide the specific commands the user will need to run to download the playbook, update the files, etc._
-
-Filebeat
-
-curl https://gist.githubusercontent.com/slape/5cc350109583af6cbe577bbcc0710c93/raw/eca603b72586fbe148c11f9c87bf96a63cb25760/Filebeat >> /etc/ansible/filebeat-config.yml
-
-then you cat filebeat.config update it the ip address of your elk server so that when you install filbeat + Metric beat on web 1-3 it send its to your elk server.
-
-Nano the hosts and make sure web 1-3 is made under a web servers group [webservers] you need to use the private's ip addresses of the web 1 - 3 under [webservers]
+This is the compiler I created to install Filbeat on my web servers
 
 
 ---
@@ -171,9 +140,42 @@ Nano the hosts and make sure web 1-3 is made under a web servers group [webserve
     systemd:
       name: filebeat
       enabled: yes
+      
+## Playbook - Filebeat
 
-then run ansible-playbook filebeat-playbook.yml ( I Ran it with - vvv for verbose) 
+---
+- name: Installing and Launch Filebeat
+  hosts: webservers
+  become: yes
+  tasks:
+    # Use command module
+  - name: Download filebeat .deb file
+    command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.0-amd64.deb
 
-and boom thats how you install filebeat on your web servers.
+    # Use command module
+  - name: Install filebeat .deb
+    command: dpkg -i filebeat-7.4.0-amd64.deb
 
-You do essentially the same thing for metric beat. 
+    # Use copy module
+  - name: Drop in filebeat.yml
+    copy:
+      src: /etc/ansible/files/filebeat-config.yml
+      dest: /etc/filebeat/filebeat.yml
+
+    # Use command module
+  - name: Enable and Configure System Module
+    command: filebeat modules enable system
+
+    # Use command module
+  - name: Setup filebeat
+    command: filebeat setup
+
+    # Use command module
+  - name: Start filebeat service
+    command: service filebeat start
+
+    # Use systemd module
+  - name: Enable service filebeat on boot
+    systemd:
+      name: filebeat
+      enabled: yes
