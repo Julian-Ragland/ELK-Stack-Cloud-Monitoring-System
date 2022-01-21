@@ -99,7 +99,7 @@ Filebeat collects log data for our web servers and forwards them to our elk serv
 Metricbeat. We expect to collect a wide assortment of data from which countries accessed the web servers, when and what they downloaded. It will also show up geographically where are vistors come from and what time they visited as well as the filetype in which they downloaded. 
 
 
-### Playbook - Filebeat
+Playbook - Filebeat
 
 This is the compiler I created to install Filbeat on my web servers
 
@@ -109,33 +109,33 @@ This is the compiler I created to install Filbeat on my web servers
   hosts: webservers
   become: yes
   tasks:
-    # Use command module
+     Use command module
   - name: Download filebeat .deb file
     command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.0-amd64.deb
 
-    # Use command module
+     Use command module
   - name: Install filebeat .deb
     command: dpkg -i filebeat-7.4.0-amd64.deb
 
-    # Use copy module
+     Use copy module
   - name: Drop in filebeat.yml
     copy:
       src: /etc/ansible/files/filebeat-config.yml
       dest: /etc/filebeat/filebeat.yml
 
-    # Use command module
+     Use command module
   - name: Enable and Configure System Module
     command: filebeat modules enable system
 
-    # Use command module
+     Use command module
   - name: Setup filebeat
     command: filebeat setup
 
-    # Use command module
+     Use command module
   - name: Start filebeat service
     command: service filebeat start
 
-    # Use systemd module
+      Use systemd module
   - name: Enable service filebeat on boot
     systemd:
       name: filebeat
@@ -148,33 +148,33 @@ This is the compiler I created to install Filbeat on my web servers
   hosts: webservers
   become: yes
   tasks:
-    # Use command module
+     Use command module
   - name: Download filebeat .deb file
     command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.0-amd64.deb
 
-    # Use command module
+    Use command module
   - name: Install filebeat .deb
     command: dpkg -i filebeat-7.4.0-amd64.deb
 
-    # Use copy module
+     Use copy module
   - name: Drop in filebeat.yml
     copy:
       src: /etc/ansible/files/filebeat-config.yml
       dest: /etc/filebeat/filebeat.yml
 
-    # Use command module
+     Use command module
   - name: Enable and Configure System Module
     command: filebeat modules enable system
 
-    # Use command module
+     Use command module
   - name: Setup filebeat
     command: filebeat setup
 
-    # Use command module
+     Use command module
   - name: Start filebeat service
     command: service filebeat start
 
-    # Use systemd module
+     Use systemd module
   - name: Enable service filebeat on boot
     systemd:
       name: filebeat
