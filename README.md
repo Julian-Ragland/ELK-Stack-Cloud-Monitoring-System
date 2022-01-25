@@ -5,7 +5,7 @@ The files in this repository were used to configure the network depicted below.
 https://www.dropbox.com/s/zd7srir3gsrc5fq/ELK%20Network%20Diagram.png?dl=0
 
 
-These files have been tested and used to generate a live ELK deployment on Azure. They can be used to either recreate the entire deployment pictured above. Alternatively, select portions of the config.yml file may be used to install only certain pieces of it, such as Filebeat.
+These files have been tested and used to generate a live ELK deployment on Azure. 
 
   - Filbeat-config.yml & Metricbeat-config.yml
 
@@ -25,7 +25,6 @@ The main purpose of this network is to expose a load-balanced and monitored inst
 Load balancing ensures that the application will be highly secure, in addition to restricting unrestricted access to the network.
 
 - The Load Balancer Protects the system from denial of service attacks by malicious actors. When it gets an influx of requests it spread them out to the 3 web servers we set up. We also set up a rule that we can only ssh on port 80 from our jump box. 
-
 
 Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the Logs and system Metrics.
 
